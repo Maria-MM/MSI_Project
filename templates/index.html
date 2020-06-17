@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <title>Polish Speech Recognition</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+	<style>
+		.button {
+			background-color: #90D2F3; /* Green */
+			border: none;
+			color: white;
+			padding: 50px;
+			text-align: center;
+			text-decoration: none;
+			display: inline-block;
+			font-size: 36px;
+			margin: 4px 2px;
+			cursor: pointer;
+			border-radius: 50%;
+			display: block;
+			margin: 0 auto;
+		}
+
+	</style>
 </head>
 <body>
 
@@ -11,6 +29,37 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.sound.min.js"></script>
+<script>
+	var isClicked = false;
+	var source;
+	function startRecording(){
+        source = new EventSource("/decode");
+        source.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            document.getElementById('trans').innerHTML = data["value"]+" ";
+        }
+	}
+	function stopRecording(){
+		document.getElementById('trans').innerHTML = "";
+		source.close()
+	}
+	function makeClick(){
+		console.log("I'm here");
+		console.log(isClicked);
+		if(!isClicked){
+			document.querySelector('#SpeakButton').innerText = 'Mów';
+			document.querySelector('#SpeakButton').style.border = '10px solid #089DEE';
+			startRecording();
+		}
+		else{
+			document.querySelector('#SpeakButton').innerText = 'Start';
+			document.querySelector('#SpeakButton').style.border = '0px solid #089DEE';
+			stopRecording();
+		}
+		isClicked = !isClicked;
+	}
+
+</script>
 
 {#<script src="{{ url_for('static', filename='mic.js') }}"></script>#}
 {#<script src="{{ url_for('static', filename='app.js')    }}"></script>#}
@@ -18,7 +67,11 @@
 <div class="container">
     <div class="row">
         <div class="col-12">
-        <h1> Polish Speech Recognition </h1>
+		    </br>
+			</br>
+       		<button class="button" onclick="makeClick()" id="SpeakButton">Start</button>
+			</br>
+			</br>
             <div class="card">
                 <div class="card-body">
                     <p id="trans"> </p>
@@ -33,15 +86,7 @@
 <!--suppress JSUnresolvedLibraryURL -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
 
-<script>
-    $(document).ready(function () {
-        const source = new EventSource("/decode");
-        source.onmessage = function (event) {
-            const data = JSON.parse(event.data);
-            document.getElementById('trans').innerHTML = data["value"]+" ";
-        }
-    });
-</script>
+
 
 </body>
 </html>

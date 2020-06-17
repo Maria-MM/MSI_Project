@@ -4,10 +4,11 @@ from record_sound import RecordingVoice
 import json
 import pyaudio
 from array import array
-import timeit
+import time
 import shutil
+import numpy as np
 
-WAVE_PATH = 'model/waves'
+WAVE_PATH = 'data/waves'
 
 app = Flask(__name__)
 
@@ -32,16 +33,14 @@ def decode():
 
         while True:
             data = stream.read(r.CHUNK)
-            
-            if len(data) == 0:
-                break
-            data_chunk = array('h', data)
+            data_chunk = np.frombuffer(data, dtype='B')
+            print(data_chunk)
+            #time.sleep(1)
             vol = max(data_chunk)
-            
-            if(vol>0):
+            if(vol > 100):
                 frames.append(data) 
-                r.save(frames, 'model/tmp.wav')
-                r.save(frames, 'model/waves/tmp'+str(count)+'.wav') 
+                r.save(frames, 'data/tmp.wav')
+                r.save(frames, 'data/waves/tmp'+str(count)+'.wav') 
                 count += 1
                 print("finished recording")
                 data_ = json.dumps(
@@ -51,10 +50,10 @@ def decode():
                 )
                 print(data_)
                 yield f"data:{data_}\n\n"
-                #time.sleep()
+                
 
     return Response(process(), mimetype='text/event-stream')
-
+    
 
 def record():
     r = RecordingVoice()
@@ -62,10 +61,9 @@ def record():
 
 
 def get_decode():
-    model = 'C:/Users/manke/Documents/MSI/FlaskKaldi'
-    command = "C:/Users/manke/Documents/MSI/kaldi/kaldiwin_vs2017_OPENBLAS_prev/x64/Debug/online-wav-gmm-decode-faster " \
-              "--rt-min=0.3 --rt-max=0.5 --max-active=40000 --beam=12.0 --acoustic-scale=0.0769 " \
-              "scp:./model/wav1.scp ./model/final.mdl ./model/HCLG.fst ./model/words.txt " \
+    command = "online-wav-gmm-decode-faster " \
+              "--rt-min=0.3 --rt-max=0.5 --max-active=4000 --beam=12.0 --acoustic-scale=0.0769 " \
+              "scp:./data/wav.scp ./model/final.mdl ./model/HCLG.fst ./model/words.txt " \
               "1:2:3:4:5 ark,t:./model/trans.txt ark,t:./model/ali.txt"
     dec = os.popen(command)
     return dec.read()

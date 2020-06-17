@@ -11,7 +11,7 @@ class RecordingVoice(object):
         self.format = pyaudio.paInt16
         self.channels = 1
         self.rate = 16000
-        self.CHUNK = 1024
+        self.CHUNK = 4000
         self.RECORD_SECONDS = 1
 
     
@@ -23,12 +23,6 @@ class RecordingVoice(object):
         wavfile.writeframes(b''.join(frames)) #append frames recorded to file
         wavfile.close()
         return True
-
-
-def record_sound():
-
-    r = RecordingVoice()
-    return r.record()
 
 
 if __name__ == '__main__':
