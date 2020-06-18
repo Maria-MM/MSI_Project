@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <title>Polish Speech Recognition</title>
@@ -29,14 +29,26 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.sound.min.js"></script>
-<script>
+<script charset="UTF-8">
 	var isClicked = false;
 	var source;
+	
+
+	function encode_utf8(s) {
+		return unescape(encodeURIComponent(s));
+	}
+
+	function decode_utf8(s) {
+		return decodeURIComponent(escape(s));
+	}
+
 	function startRecording(){
         source = new EventSource("/decode");
         source.onmessage = function (event) {
             const data = JSON.parse(event.data);
-            document.getElementById('trans').innerHTML = data["value"]+" ";
+			var str = data["value"].replace(/(\r\n|\n|\r)/gm, "").replace(/\\/g, "\\\\");;
+			console.log(str)
+			document.getElementById('trans').innerHTML = str ;
         }
 	}
 	function stopRecording(){
@@ -74,7 +86,7 @@
 			</br>
             <div class="card">
                 <div class="card-body">
-                    <p id="trans"> </p>
+                    <p id="trans" accept-charset="UTF-8"> </p>
                 </div>
             </div>
         </div>

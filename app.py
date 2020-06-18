@@ -35,7 +35,6 @@ def decode():
             data = stream.read(r.CHUNK)
             data_chunk = np.frombuffer(data, dtype='B')
             print(data_chunk)
-            #time.sleep(1)
             vol = max(data_chunk)
             if(vol > 100):
                 frames.append(data) 
@@ -43,12 +42,19 @@ def decode():
                 r.save(frames, 'data/waves/tmp'+str(count)+'.wav') 
                 count += 1
                 print("finished recording")
+                decoded_str = get_decode()
+                print("decoded " + decoded_str)
+                decoded_bytes = decoded_str.encode('raw_unicode_escape')
+                print("bytes " + str(decoded_bytes))
+                decoded = decoded_bytes.decode('utf8')
+                print(decoded)
                 data_ = json.dumps(
                     {
-                        'value': get_decode(),
+                        'value': decoded
                      }
                 )
                 print(data_)
+                #print(data_['value'])
                 yield f"data:{data_}\n\n"
                 
 
