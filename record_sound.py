@@ -11,7 +11,7 @@ class RecordingVoice(object):
         self.format = pyaudio.paInt16
         self.channels = 1
         self.rate = 16000
-        self.CHUNK = 4000
+        self.CHUNK = 8000
         self.RECORD_SECONDS = 1
 
     

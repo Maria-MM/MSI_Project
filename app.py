@@ -15,6 +15,8 @@ app = Flask(__name__)
 if os.path.isdir(WAVE_PATH):
     shutil.rmtree(WAVE_PATH)
 os.makedirs(WAVE_PATH)
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -36,21 +38,23 @@ def decode():
             data_chunk = np.frombuffer(data, dtype='B')
             print(data_chunk)
             vol = max(data_chunk)
-            if(vol > 100):
+            if(vol > 200):
                 frames.append(data) 
                 r.save(frames, 'data/tmp.wav')
                 r.save(frames, 'data/waves/tmp'+str(count)+'.wav') 
                 count += 1
                 print("finished recording")
                 decoded_str = get_decode()
-                print("decoded " + decoded_str)
-                decoded_bytes = decoded_str.encode('raw_unicode_escape')
-                print("bytes " + str(decoded_bytes))
-                decoded = decoded_bytes.decode('utf8')
-                print(decoded)
+                print(type(decoded_str))
+                print(decoded_str)
+                print(decoded_str,  file=open('data\decoded.txt', 'w')) 
+                
+                with open('data\decoded.txt', encoding = "utf8") as file:
+                    decoded_str = file.read().replace('\n', '')
+                
                 data_ = json.dumps(
                     {
-                        'value': decoded
+                        'value': decoded_str
                      }
                 )
                 print(data_)

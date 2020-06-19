@@ -46,8 +46,7 @@
         source = new EventSource("/decode");
         source.onmessage = function (event) {
             const data = JSON.parse(event.data);
-			var str = data["value"].replace(/(\r\n|\n|\r)/gm, "").replace(/\\/g, "\\\\");;
-			console.log(str)
+			var str = data["value"].replace(/(\r\n|\n|\r)/gm, "");
 			document.getElementById('trans').innerHTML = str ;
         }
 	}
@@ -56,8 +55,6 @@
 		source.close()
 	}
 	function makeClick(){
-		console.log("I'm here");
-		console.log(isClicked);
 		if(!isClicked){
 			document.querySelector('#SpeakButton').innerText = 'Mów';
 			document.querySelector('#SpeakButton').style.border = '10px solid #089DEE';
