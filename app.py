@@ -7,14 +7,14 @@ from array import array
 import time
 import shutil
 import numpy as np
+from datetime import datetime
 
 WAVE_PATH = 'data/waves'
 
 app = Flask(__name__)
 
-if os.path.isdir(WAVE_PATH):
-    shutil.rmtree(WAVE_PATH)
-os.makedirs(WAVE_PATH)
+if not os.path.isdir(WAVE_PATH):
+    os.makedirs(WAVE_PATH)
 
 
 @app.route('/')
@@ -32,24 +32,25 @@ def decode():
         stream.start_stream()
         count = 0
         frames = []
+        date_time = datetime.today().strftime('%Y-%m-%d-%H-%M-%S')
+        current_path = WAVE_PATH + '/' + date_time
+        os.makedirs(current_path)
 
         while True:
             data = stream.read(r.CHUNK)
             data_chunk = np.frombuffer(data, dtype='B')
             print(data_chunk)
             vol = max(data_chunk)
-            if(vol > 200):
+            if(vol > 100):
                 frames.append(data) 
                 r.save(frames, 'data/tmp.wav')
-                r.save(frames, 'data/waves/tmp'+str(count)+'.wav') 
                 count += 1
+                r.save(frames, current_path + '/tmp'+str(count)+'.wav')
                 print("finished recording")
                 decoded_str = get_decode()
-                print(type(decoded_str))
-                print(decoded_str)
-                print(decoded_str,  file=open('data\decoded.txt', 'w')) 
+                print(decoded_str,  file=open(current_path + '/tmp'+str(count)+'.txt', 'w')) 
                 
-                with open('data\decoded.txt', encoding = "utf8") as file:
+                with open(current_path + '/tmp'+str(count)+'.txt', encoding = "utf8") as file:
                     decoded_str = file.read().replace('\n', '')
                 
                 data_ = json.dumps(
@@ -58,7 +59,6 @@ def decode():
                      }
                 )
                 print(data_)
-                #print(data_['value'])
                 yield f"data:{data_}\n\n"
                 
 
